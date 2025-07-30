@@ -1,0 +1,74 @@
+<script lang="ts">
+	// Libraries:
+	import { superForm, defaults } from 'sveltekit-superforms';
+	import { zod4 as zod, zodClient } from 'sveltekit-superforms/adapters';
+
+	// Components:
+	import * as Form from '$lib/components/ui/form/index.js';
+	import AutoformField from './fields/autoform-field.svelte';
+
+	// Utility
+	import { getMeta } from './autoform';
+
+	// Props:
+	import type { AutoFormProps } from './types';
+	let {
+		form_id,
+		form_schema,
+		title,
+		action,
+		description,
+		button_text,
+		callback,
+		open = $bindable()
+	}: AutoFormProps = $props();
+	let loading = $state(false);
+	const form_data = $state(defaults(zod(form_schema)));
+	const super_form = $state(
+		// Renamed to avoid confusion with the $form store from super_form.form
+		superForm(form_data, {
+			dataType: 'json',
+			id: form_id,
+			validators: zodClient(form_schema),
+			validationMethod: 'auto',
+			onResult: ({ result }) => {
+				// This hook is called after the server responds to the form submission.
+				if (result.type === 'success' || result.type === 'redirect') {
+					super_form.reset(); // Reset the form fields
+					if (open) open = false; // Close the dialog
+					loading = false;
+
+					if (callback) callback(result); // Call the main callback prop
+				}
+
+				if (result.type === 'error' || result.type === 'failure') {
+					loading = false;
+					console.log(result);
+				}
+			}
+		})
+	);
+	const { form, errors, message, enhance, delayed } = super_form;
+	const form_meta = getMeta(form_schema);
+	//console.log(action);
+</script>
+
+<form method="post" {...action ? { action } : {}} use:enhance>
+	{#each form_meta.fields as field}
+		<AutoformField superform={super_form} field={field.field_id} meta={field} />
+	{/each}
+	{#if !loading}
+		<Form.Button
+			onclick={() => {
+				loading = true;
+				super_form.submit();
+			}}>{button_text ? button_text : 'Submit'}</Form.Button
+		>
+	{:else}
+		<Form.Button disabled>Submitting...</Form.Button>
+	{/if}
+
+	{#if $message && $message.text}
+		{$message.text}
+	{/if}
+</form>
