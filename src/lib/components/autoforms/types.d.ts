@@ -16,12 +16,16 @@ export interface FieldMeta {
 
 export type AutoFormProps<T extends z.ZodRawShape = z.ZodRawShape> = {
 	form_schema: z.ZodObject<T>;
+	spa_mode?: string | true | undefined;
+	form_meta?: FormMeta;
 	form_id?: string;
 	title?: string;
 	action?: string;
 	description?: string;
 	button_text?: string;
-	//callback?: () => void;
-	callback?: (form_data?: z.infer<z.ZodObject<T>>) => void; // Updated type
+	// Updated callback type to handle async and return values
+	callback?: (
+		result: any
+	) => Promise<{ error?: { message: string } } | void> | { error?: { message: string } } | void;
 	open?: boolean;
 };

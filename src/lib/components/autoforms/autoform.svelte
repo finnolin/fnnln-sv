@@ -6,6 +6,7 @@
 	// Components:
 	import * as Form from '$lib/components/ui/form/index.js';
 	import AutoformField from './fields/autoform-field.svelte';
+	import AutoformMessage from './autoform-message.svelte';
 
 	// Utility
 	import { getMeta } from './autoform';
@@ -15,6 +16,7 @@
 	let {
 		form_id,
 		form_schema,
+		spa_mode,
 		title,
 		action,
 		description,
@@ -22,27 +24,47 @@
 		callback,
 		open = $bindable()
 	}: AutoFormProps = $props();
+
 	let loading = $state(false);
+	const apply_action = spa_mode ? false : true;
+
 	const form_data = $state(defaults(zod(form_schema)));
 	const super_form = $state(
 		// Renamed to avoid confusion with the $form store from super_form.form
 		superForm(form_data, {
+			SPA: spa_mode,
 			dataType: 'json',
 			id: form_id,
 			validators: zodClient(form_schema),
 			validationMethod: 'auto',
-			onResult: ({ result }) => {
+			onResult: async ({ result }) => {
 				// This hook is called after the server responds to the form submission.
+				if (result) {
+					if (callback) {
+						// Await the callback if it's async
+						const callback_result = await callback(result);
+
+						// Handle any errors returned from the callback
+						if (callback_result && callback_result.error) {
+							// Set form-level error or field-specific errors
+							super_form.message.set({
+								type: 'error',
+								text: callback_result.error.message || 'An error occurred'
+							});
+							result.type = 'error';
+						}
+					}
+				}
+
 				if (result.type === 'success' || result.type === 'redirect') {
 					super_form.reset(); // Reset the form fields
 					if (open) open = false; // Close the dialog
 					loading = false;
-
-					if (callback) callback(result); // Call the main callback prop
 				}
 
 				if (result.type === 'error' || result.type === 'failure') {
 					loading = false;
+					console.log('ERRR:');
 					console.log(result);
 				}
 			}
@@ -50,7 +72,7 @@
 	);
 	const { form, errors, message, enhance, delayed } = super_form;
 	const form_meta = getMeta(form_schema);
-	//console.log(action);
+	console.log(spa_mode);
 </script>
 
 <form method="post" {...action ? { action } : {}} use:enhance>
@@ -62,13 +84,11 @@
 			onclick={() => {
 				loading = true;
 				super_form.submit();
-			}}>{button_text ? button_text : 'Submit'}</Form.Button
-		>
+			}}>{button_text ? button_text : 'Submit'}</Form.Button>
 	{:else}
 		<Form.Button disabled>Submitting...</Form.Button>
 	{/if}
-
 	{#if $message && $message.text}
-		{$message.text}
+		<AutoformMessage message={$message} />
 	{/if}
 </form>
