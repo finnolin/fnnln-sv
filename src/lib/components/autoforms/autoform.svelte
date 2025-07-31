@@ -7,12 +7,14 @@
 	import * as Form from '$lib/components/ui/form/index.js';
 	import AutoformField from './fields/autoform-field.svelte';
 	import AutoformMessage from './autoform-message.svelte';
+	import * as Card from '$lib/components/ui/card/index.js';
 
 	// Utility
 	import { getMeta } from './autoform';
 
 	// Props:
 	import type { AutoFormProps } from './types';
+
 	let {
 		form_id,
 		form_schema,
@@ -20,14 +22,13 @@
 		title,
 		action,
 		description,
+		container_type = 'none',
 		button_text,
 		callback,
 		open = $bindable()
 	}: AutoFormProps = $props();
 
 	let loading = $state(false);
-	const apply_action = spa_mode ? false : true;
-
 	const form_data = $state(defaults(zod(form_schema)));
 	const super_form = $state(
 		// Renamed to avoid confusion with the $form store from super_form.form
@@ -43,7 +44,6 @@
 					if (callback) {
 						// Await the callback if it's async
 						const callback_result = await callback(result);
-
 						// Handle any errors returned from the callback
 						if (callback_result && callback_result.error) {
 							// Set form-level error or field-specific errors
@@ -70,25 +70,48 @@
 			}
 		})
 	);
-	const { form, errors, message, enhance, delayed } = super_form;
+	const { message, enhance } = super_form;
 	const form_meta = getMeta(form_schema);
-	console.log(spa_mode);
 </script>
 
-<form method="post" {...action ? { action } : {}} use:enhance>
-	{#each form_meta.fields as field}
-		<AutoformField superform={super_form} field={field.field_id} meta={field} />
-	{/each}
-	{#if !loading}
-		<Form.Button
-			onclick={() => {
-				loading = true;
-				super_form.submit();
-			}}>{button_text ? button_text : 'Submit'}</Form.Button>
-	{:else}
-		<Form.Button disabled>Submitting...</Form.Button>
-	{/if}
-	{#if $message && $message.text}
-		<AutoformMessage message={$message} />
-	{/if}
-</form>
+{#snippet formContent()}
+	<Card.Root>
+		{#if title || description}
+			<Card.Header>
+				{#if title}
+					<Card.Title>{title}</Card.Title>
+				{/if}
+				{#if description}
+					<Card.Description>{description}</Card.Description>
+				{/if}
+			</Card.Header>
+		{/if}
+		<Card.Content>
+			<form method="post" {...action ? { action } : {}} use:enhance>
+				{#each form_meta.fields as field}
+					<AutoformField superform={super_form} field={field.field_id} meta={field} />
+				{/each}
+				{#if !loading}
+					<Form.Button
+						onclick={() => {
+							loading = true;
+							super_form.submit();
+						}}>{button_text ? button_text : 'Submit'}</Form.Button>
+				{:else}
+					<Form.Button disabled>Submitting...</Form.Button>
+				{/if}
+				{#if $message && $message.text}
+					<AutoformMessage message={$message} />
+				{/if}
+			</form>
+		</Card.Content>
+	</Card.Root>
+{/snippet}
+
+{#if container_type === 'dialog'}
+	{@render formContent()}
+{:else if container_type === 'modal'}
+	{@render formContent()}
+{:else}
+	{@render formContent()}
+{/if}

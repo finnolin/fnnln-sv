@@ -12,9 +12,10 @@
 
 <Autoform
 	form_schema={form_schema_register}
+	title="Register"
+	button_text="Register"
 	action={'?/register'}
 	callback={(result) => {
 		const form_data = result.data.form.data;
 		handleSignIn(form_data.email, form_data.password);
-	}}
-/>
+	}} />

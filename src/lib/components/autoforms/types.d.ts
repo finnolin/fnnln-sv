@@ -23,7 +23,7 @@ export type AutoFormProps<T extends z.ZodRawShape = z.ZodRawShape> = {
 	action?: string;
 	description?: string;
 	button_text?: string;
-	// Updated callback type to handle async and return values
+	container_type?: 'dialog' | 'modal' | 'none';
 	callback?: (
 		result: any
 	) => Promise<{ error?: { message: string } } | void> | { error?: { message: string } } | void;

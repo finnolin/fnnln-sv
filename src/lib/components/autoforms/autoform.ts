@@ -16,6 +16,7 @@ export interface FieldMeta {
 	description?: string;
 	readonly?: boolean;
 	hidden?: boolean;
+	autocomplete?: string;
 	component: FieldType;
 }
 

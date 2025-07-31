@@ -23,7 +23,11 @@
 	<Form.Control>
 		{#snippet children({ props })}
 			<Form.Label>{meta.label}</Form.Label>
-			<meta.component {...props} field_meta={meta} bind:value={$value} />
+			<meta.component
+				{...props}
+				field_meta={meta}
+				bind:value={$value}
+				{...meta.autocomplete ? { autocomplete: meta.autocomplete } : {}} />
 		{/snippet}
 	</Form.Control>
 	<Form.FieldErrors />

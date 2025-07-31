@@ -7,12 +7,14 @@ export const form_schema_login = z
 		email: z.string().min(3).register(field_registry, {
 			field_id: 'email',
 			label: 'Email',
+			autocomplete: 'email, username',
 			component: Fields.Text
 		}),
 		password: z.string().register(field_registry, {
 			field_id: 'password',
 			label: 'Password',
 			hidden: true,
+			autocomplete: 'current-password',
 			component: Fields.Text
 		})
 	})
