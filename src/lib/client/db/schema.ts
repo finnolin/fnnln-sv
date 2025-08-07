@@ -11,7 +11,11 @@ export const user = pgTable('user', {
 	email_verified: boolean('email_verified'),
 	image: text('image'),
 	created: timestamp('created').defaultNow(),
-	updated: timestamp('updated').defaultNow()
+	updated: timestamp('updated').defaultNow(),
+	role: text('role').default('user'),
+	banned: boolean('banned').default(false),
+	ban_reason: text('ban_reason'),
+	ban_expires: timestamp('ban_expires')
 });
 
 export type User = typeof user.$inferSelect;

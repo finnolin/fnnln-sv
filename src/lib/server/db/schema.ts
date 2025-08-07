@@ -15,7 +15,8 @@ export const session = pgTable('session', {
 	ip_address: text('ip_address'),
 	user_agent: text('user_agent'),
 	created: timestamp('created').defaultNow(),
-	updated: timestamp('updated').defaultNow()
+	updated: timestamp('updated').defaultNow(),
+	impersonated_by: text('impersonated_by').references(() => schema.user.id)
 });
 export type Session = typeof session.$inferSelect;
 

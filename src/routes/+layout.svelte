@@ -7,6 +7,8 @@
 </script>
 
 <ModeWatcher />
-<ThemeToggle />
-<WidgetUser />
-{@render children()}
+<div class="flex h-lvh flex-col">
+	<!-- <ThemeToggle /> -->
+	<WidgetUser />
+	{@render children()}
+</div>

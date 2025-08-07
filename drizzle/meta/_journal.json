@@ -29,6 +29,13 @@
       "when": 1753820576489,
       "tag": "0003_complete_molten_man",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1753994741421,
+      "tag": "0004_far_bruce_banner",
+      "breakpoints": true
     }
   ]
 }

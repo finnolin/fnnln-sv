@@ -28,8 +28,10 @@
 						<Button variant="ghost" class="w-full items-start justify-start rounded-none"
 							>Account</Button>
 						<Separator class="p-[1px]" />
-						<Button variant="ghost" class="w-full items-start justify-start rounded-none"
-							>Manage App</Button>
+						<Button
+							href="/admin/users"
+							variant="ghost"
+							class="w-full items-start justify-start rounded-none">Manage App</Button>
 					</div>
 					<Separator class="p-[1px]" />
 					<div class="flex w-full flex-col items-center p-4">
