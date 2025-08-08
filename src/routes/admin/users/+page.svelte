@@ -56,7 +56,7 @@
 			{/each}
 		</Table.Body>
 	</Table.Root>
-	<div class="flex h-10 w-full flex-row items-center justify-between p-2">
+	<div class="flex w-full flex-row items-center justify-between p-2">
 		<DbPagination
 			bind:current_page
 			offset={query.o}
